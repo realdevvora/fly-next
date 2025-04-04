@@ -1,0 +1,4 @@
+Almost all of our UI was generated via Claude. We created dummy template components to start off with, and then followed up by using Claude to
+integrate our APIs and create functional UIs effectively.
+
+Any UI that we didn't use claude for (i.e dashboard) we marked with comments, as these components were generated via a different LLM (Lovable, or ChatGPT)

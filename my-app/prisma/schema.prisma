@@ -1,0 +1,187 @@
+// This is your Prisma schema file for a travel booking platform
+// Using SQLite as the database provider
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x", "linux-arm64-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Models
+model User {
+  id             String           @id @default(uuid())
+  email          String           @unique
+  password       String           // hashed
+  role           UserRole         @default(User)
+  firstName      String
+  lastName       String
+  profilePicture String?
+  phoneNumber    String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  bookings       Booking[]
+  hotels         Hotel[]
+  notifications  Notification[]
+  prefersDarkMode Boolean         @default(false)
+}
+
+// Flight Information Reference (REFERENCE TO AFS DATA)
+model FlightBookingReference {
+  id               String    @id @default(uuid())
+  afsBookingId     String       @unique // unique identifier from AFS
+  bookingId        String
+  booking          Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  passengerCount   Int
+  totalPrice       Float
+  isRoundTrip      Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Hotel {
+  id             String    @id @default(uuid())
+  name           String
+  logo           String?
+  address        String
+  city           String
+  country        String
+  location       String    // Coordinates for map display
+  starRating     Int
+  images         String[]
+  roomTypes      RoomType[]
+  ownerId        String
+  owner          User      @relation(fields: [ownerId], references: [id])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  bookings       RoomBooking[] 
+}
+
+model RoomType {
+  id              String    @id @default(uuid())
+  name            String    // e.g., Twin, Double, Suite
+  description     String
+  pricePerNight   Float
+  totalRooms      Int       // Total number of this room type in the hotel
+  hotelId         String
+  hotel           Hotel     @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  amenities       String[]
+  images          String[]
+  roomBookings    RoomBooking[]
+  availability    RoomAvailability[] // Add this line
+}
+
+model RoomAvailability {
+  id             String    @id @default(uuid())
+  roomTypeId     String
+  roomType       RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+  date           DateTime
+  availableRooms Int
+
+  @@unique([roomTypeId, date])
+}
+
+model Booking {
+  id                      String        @id @default(uuid())
+  userId                  String
+  user                    User          @relation(fields: [userId], references: [id])
+  bookingDate             DateTime      @default(now())
+  totalPrice              Float
+  status                  BookingStatus @default(CONFIRMED)
+  invoiceUrl              String?       // URL to the generated PDF invoice
+  paymentInfo             PaymentInfo?
+  flightBookingReferences FlightBookingReference[]
+  roomBookings            RoomBooking[]
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  flightSearchParams      String?       // JSON string with parameters used for flight search
+  notifications           Notification[]
+}
+
+model RoomBooking {
+  id            String    @id @default(uuid())
+  bookingId     String
+  booking       Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  roomTypeId    String
+  roomType      RoomType  @relation(fields: [roomTypeId], references: [id])
+  checkInDate   DateTime
+  checkOutDate  DateTime
+  guestCount    Int
+  totalPrice    Float
+  hotel         Hotel     @relation(fields: [hotelId], references: [id])
+  hotelId       String
+}
+
+model RecentFlightSearch {
+  id               String    @id @default(uuid())
+  userId           String?
+  sourceCity       String
+  destinationCity  String
+  departureDate    DateTime
+  returnDate       DateTime?
+  createdAt        DateTime  @default(now())
+}
+
+model Notification {
+  id            String           @id @default(uuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id])
+  title         String
+  message       String
+  isRead        Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  type          NotificationType
+  bookingId     String?
+  booking       Booking?         @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+}
+
+model PaymentInfo {
+  id              String    @id @default(uuid())
+  bookingId       String    @unique
+  booking         Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  cardholderName  String
+  lastFourDigits  String
+  expiryDate      String
+  createdAt       DateTime  @default(now())
+}
+
+model City {
+  id      String  @id @default(uuid())
+  city    String
+  country String
+
+  airports Airport[]
+}
+
+model Airport {
+  id      String  @id @default(uuid())
+  code    String  @unique
+  name    String
+  city    String
+  country String
+  cityId  String
+  cityRel City    @relation(fields: [cityId], references: [id], onDelete: Cascade)
+}
+
+// Enums
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum NotificationType {
+  BOOKING_CONFIRMATION
+  BOOKING_CANCELLATION
+  BOOKING_UPDATE  
+  HOTEL_NEW_BOOKING
+  PAYMENT_CONFIRMATION
+  CHECK_IN_REMINDER 
+}
+
+enum UserRole {
+  User
+}
