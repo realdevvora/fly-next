@@ -19,7 +19,7 @@ const BookingSearchInput: React.FC<BookingSearchInputProps> = ({
 }) => {
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-white">{label}</label>
       <input
         type={type}
         value={value}

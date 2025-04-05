@@ -10,9 +10,9 @@ import HotelSearchForm from '../../../components/HotelBookingSearchForm';
  */
 const HotelBookingContent: React.FC = () => {
   return (
-    <div className="flex min-h-screen flex-col bg-white dark:bg-gray-900">
+    <div className="flex min-h-screen flex-col dark:bg-gray-900">
       <main className="flex-grow pt-24">
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
@@ -50,10 +50,10 @@ const HotelBookingPage: React.FC = () => {
   // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center">
           <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );

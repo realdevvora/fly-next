@@ -115,7 +115,7 @@ const HotelAvailabilitySearchForm: React.FC<HotelAvailabilitySearchProps> = ({ c
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4">
           {/* Hotel Selection Dropdown */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-white">
               Hotel <span className="text-red-500">*</span>
             </label>
             <select
@@ -134,7 +134,7 @@ const HotelAvailabilitySearchForm: React.FC<HotelAvailabilitySearchProps> = ({ c
               ))}
             </select>
             {isLoadingHotels && (
-              <div className="text-sm text-gray-500">Loading your hotels...</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">Loading your hotels...</div>
             )}
           </div>
 
